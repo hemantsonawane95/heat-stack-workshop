@@ -4,7 +4,7 @@ Heat is a service to orchestrate multiple composite cloud applications using tem
 ### Heat template orchestration guide
 https://docs.openstack.org/heat/rocky/template_guide/hot_guide.html
 
-# heat-stack-workshop
+# Heat-stack-workshop
 This repository contains templates for use with [OpenStack Heat](https://wiki.openstack.org/wiki/Heat) to deploy openstack resources.
 
 # Pre-requisites
