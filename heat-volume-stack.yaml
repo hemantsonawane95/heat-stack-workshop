@@ -1,0 +1,20 @@
+# heat template version
+heat_template_version: 2016-10-14
+
+# a declaration of the template
+description: Heat stack workshop
+
+# declaration of input parameters
+parameters:
+  heat_volume_size:
+    type: number
+    label: Volume Size (GB)
+    description: External Volume size in GB
+    default: 10
+
+# declaration of template resources 
+resources:
+  volume-01:
+    type: OS::Cinder::Volume
+    properties:
+      size: { get_param: heat_volume_size }

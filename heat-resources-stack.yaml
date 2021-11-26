@@ -1,0 +1,98 @@
+# heat template version
+heat_template_version: 2016-10-14
+
+# a declaration of the template
+description: Heat stack workshopi (simple template to deploy server with resources)
+
+# declaration of input parameters
+parameters:
+  flavor:
+    type: string
+    description: Flavor type for the instance to be created
+    default: m1.medium
+    constraints:
+      - custom_constraint: nova.flavor
+  image:
+    type: string
+    description: ID or name of the image to use for the instance
+    default: bionic-server-cloudimg-amd64
+    constraints:
+      - custom_constraint: glance.image
+  ssh_key:
+     type: string
+     description: Public key of the user created or imported in openstack
+     default: heat-stack-key
+  heat_volume_size:
+    type: number
+    label: Volume Size (GB)
+    description: External Volume Size in GB
+    default: 20
+  heat_floating_ip_net:
+    description: Floating ip network
+    type: string
+    default: public2
+    
+# declaration of template resources     
+resources:
+  heat_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: { get_param: heat_volume_size }
+  heat_volume_attachment:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      volume_id: { get_resource: heat_volume }
+      instance_uuid: { get_resource: heat_server }
+  heat_network:
+    type: OS::Neutron::Net
+    properties:
+      admin_state_up: true
+      name: heat_network
+  heat_network_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      key_name: { get_param: ssh_key }
+      network: { get_resource: heat_network }
+      cidr: "10.1.1.0/24"
+      dns_nameservers: ["8.8.8.8"]
+      gateway_ip: "10.1.1.1"
+      ip_version: 4
+  heat_router:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info: { network: { get_param: heat_floating_ip_net  } }
+      name: heat_router
+  heat_router_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: heat_router }
+      subnet: { get_resource: heat_network_subnet }
+  heat_server_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: heat_network }
+      fixed_ips:
+        - subnet_id: { get_resource: heat_network_subnet }
+  heat_server:
+    type: OS::Nova::Server
+    properties:
+      name: heat_server
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      networks:
+        - port: { get_resource: heat_server_port }
+  heat_server_public_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: heat_floating_ip_net }
+  heat_server_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: heat_server_public_ip }
+      port_id: { get_resource: heat_server_port }
+
+# declaration of output parameters
+outputs:
+  heat_server_public_ip:
+    description: IP Address of the deployed heat_server instance
+    value: { get_attr: [ heat_server_public_ip, floating_ip_address ]}   
