@@ -62,7 +62,7 @@ export OS_INTERFACE=public
 
 Lets create single volume in openstack env by running `heat-volume-stack.yaml` file
     
-    `openstack stack create -t heat-volume-stack.yaml <stack_name>`
+        openstack stack create -t heat-volume-stack.yaml <stack_name>
     
         +---------------------+--------------------------------------+
         | Field               | Value                                |
@@ -78,7 +78,7 @@ Lets create single volume in openstack env by running `heat-volume-stack.yaml` f
         
 This will create a single volume of 10Gb size as follows: 
 
-        `openstack volume list`
+        openstack volume list
         
         +--------------------------------------+-------------------------------------+-----------+------+-------------+
         | ID                                   | Name                                | Status    | Size | Attached to |
@@ -120,7 +120,7 @@ Create server with resources such as network, volume, floating ip, ports etc.
        
 Similarly, as we created volume using heat template this script will create all the necessary resources along with server.
 
-        `openstack stack create -t heat-resources-stack.yaml <stack_name>`
+        openstack stack create -t heat-resources-stack.yaml <stack_name>
      
         +---------------------+--------------------------------------+                                                                                
         | Field               | Value                                |                                                                                             
