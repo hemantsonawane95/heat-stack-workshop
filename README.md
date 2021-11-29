@@ -124,6 +124,6 @@ You can use two sets of resources to create and associate floating IPs to instan
   Use the `OS::Cinder::Volume` resource to create a new Block Storage volume. Also we can create it as parameter and use it in resources.
 
 **Attach a volume to an instance:**
-  Use the OS::Cinder::VolumeAttachment resource to attach a volume to an instance.
+  Use the `OS::Cinder::VolumeAttachment` resource to attach a volume to an instance.
 
 For more details about heat-template orchestration guide please check official documentation metioned above.
