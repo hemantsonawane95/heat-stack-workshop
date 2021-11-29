@@ -102,9 +102,11 @@ The name or ID of an existing network. You don’t need to create an `OS::Neutro
 **Create and associate a floating IP to an instance:**
 
 You can use two sets of resources to create and associate floating IPs to instances.
-  **1. OS::Nova resources:**
+ 
+**1. OS::Nova resources:**
     Use the `OS::Nova::FloatingIP` resource to create a floating IP, and the `OS::Nova::FloatingIPAssociation` resource to associate the floating IP to an instance.
-  **2. OS::Neutron resources:**
+ 
+**2. OS::Neutron resources:**
     Use the `OS::Neutron::FloatingIP` resource to create a floating IP, and the `OS::Neutron::FloatingIPAssociation` resource to associate the floating IP to a port
     we have used this set to create floating ip and attached to instance in this workshop.
 
