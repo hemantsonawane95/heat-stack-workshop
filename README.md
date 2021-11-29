@@ -64,7 +64,6 @@ Lets create single volume in openstack env by running `heat-volume-stack.yaml` f
     
     `openstack stack create -t heat-volume-stack.yaml <stack_name>`
     
-    ```
         +---------------------+--------------------------------------+
         | Field               | Value                                |
         +---------------------+--------------------------------------+
@@ -76,31 +75,29 @@ Lets create single volume in openstack env by running `heat-volume-stack.yaml` f
         | stack_status        | CREATE_IN_PROGRESS                   |
         | stack_status_reason | Stack CREATE started                 |
         +---------------------+--------------------------------------+
-    ```    
+        
 This will create a single volume of 10Gb size as follows: 
 
         `openstack volume list`
         
-    ```
         +--------------------------------------+-------------------------------------+-----------+------+-------------+
         | ID                                   | Name                                | Status    | Size | Attached to |
         +--------------------------------------+-------------------------------------+-----------+------+-------------+
         | cb7f8f2e-d5bd-42e4-bcb4-b62f63dcc8a6 | volume-stack-volume-01-26jz4xci46ia | available |   10 |             |
         +--------------------------------------+-------------------------------------+-----------+------+-------------+
-        ```
+  
 To resize volume change the `default` size in heat-volume-stack.yaml file to required value:
 
-    ```
+    
      parameters:
        heat_volume_size:
          type: number
          label: Volume Size (GB)
          description: External Volume size in GB
          default: 20
-    ```
+    
 Run `openstack stack update -t heat-volume-stack.yaml <stack-name>`
 
-    ```
         +---------------------+--------------------------------------+
         | Field               | Value                                |
         +---------------------+--------------------------------------+
@@ -112,14 +109,11 @@ Run `openstack stack update -t heat-volume-stack.yaml <stack-name>`
         | stack_status        | UPDATE_IN_PROGRESS                   |
         | stack_status_reason | Stack UPDATE started                 |
         +---------------------+--------------------------------------+
-    ```
-    ```
         +--------------------------------------+-------------------------------------+-----------+------+-------------+
         | ID                                   | Name                                | Status    | Size | Attached to |
         +--------------------------------------+-------------------------------------+-----------+------+-------------+
         | cb7f8f2e-d5bd-42e4-bcb4-b62f63dcc8a6 | volume-stack-volume-01-26jz4xci46ia | available |   20 |             |
         +--------------------------------------+-------------------------------------+-----------+------+-------------+
-    ```
 
 ### Task-2
 
