@@ -57,134 +57,71 @@ export OS_INTERFACE=public
      * 'heat_volume_size' : specify the external volume size which needs to be attached to the server
      * 'heat_floating_ip_net' : specify valid floating ip network name
   3. source openrc file using command `source openrc`
-    
+
+Note: The template must be in yaml format and be saved with the .yaml file extension. You should also make sure that you use the correct indentation. 
+
 ### Task-1 : Volume creation in openstack using heat-template
 
-Lets create single volume in openstack env by running `heat-volume-stack.yaml` file
-    
-        openstack stack create -t heat-volume-stack.yaml <stack_name>
-    
-        +---------------------+--------------------------------------+
-        | Field               | Value                                |
-        +---------------------+--------------------------------------+
-        | id                  | 4cf6a524-eb8b-4d74-b450-8a8d16bceb0d |
-        | stack_name          | volume-stack                         |
-        | description         | Heat stack workshop                  |
-        | creation_time       | 2021-11-26T07:33:54Z                 |
-        | updated_time        | None                                 |
-        | stack_status        | CREATE_IN_PROGRESS                   |
-        | stack_status_reason | Stack CREATE started                 |
-        +---------------------+--------------------------------------+
-        
-This will create a single volume of 10Gb size as follows: 
+The ultimate goal of this task is to create volume in openstack env using heat-template. Use `heat-volume-stack.yaml` template to create volume. 
+By running openstack heat command `openstack heat create` will create 10GB size volume in openstack env. It can be verified via openstack cli or in openstack horizon. 
 
-        openstack volume list
-        
-        +--------------------------------------+-------------------------------------+-----------+------+-------------+
-        | ID                                   | Name                                | Status    | Size | Attached to |
-        +--------------------------------------+-------------------------------------+-----------+------+-------------+
-        | cb7f8f2e-d5bd-42e4-bcb4-b62f63dcc8a6 | volume-stack-volume-01-26jz4xci46ia | available |   10 |             |
-        +--------------------------------------+-------------------------------------+-----------+------+-------------+
-  
-To resize volume change the `default` size in heat-volume-stack.yaml file to required value:
+For resizing volume change the default size in `heat-volume-stack.yaml` and then running stack update will resize the volume to updated size.
 
-     parameters:
-       heat_volume_size:
-         type: number
-         label: Volume Size (GB)
-         description: External Volume size in GB
-         default: 20
-    
-Run `openstack stack update -t heat-volume-stack.yaml <stack-name>`
-
-        +---------------------+--------------------------------------+
-        | Field               | Value                                |
-        +---------------------+--------------------------------------+
-        | id                  | 4cf6a524-eb8b-4d74-b450-8a8d16bceb0d |
-        | stack_name          | volume-stack                         |
-        | description         | Heat stack workshop                  |
-        | creation_time       | 2021-11-26T07:33:54Z                 |
-        | updated_time        | 2021-11-26T07:34:24Z                 |
-        | stack_status        | UPDATE_IN_PROGRESS                   |
-        | stack_status_reason | Stack UPDATE started                 |
-        +---------------------+--------------------------------------+
-        +--------------------------------------+-------------------------------------+-----------+------+-------------+
-        | ID                                   | Name                                | Status    | Size | Attached to |
-        +--------------------------------------+-------------------------------------+-----------+------+-------------+
-        | cb7f8f2e-d5bd-42e4-bcb4-b62f63dcc8a6 | volume-stack-volume-01-26jz4xci46ia | available |   20 |             |
-        +--------------------------------------+-------------------------------------+-----------+------+-------------+
 
 ### Task-2 : Create full resources in openstack 
 
-Create server with resources such as network, volume, floating ip, ports etc. 
-       
-Similarly, as we created volume using heat template this script will create all the necessary resources along with server.
+This task is all about creating resources needed to run a server in openstack env using heat-template. Use `heat-resources-stack.yaml` template to create resources.
 
-        openstack stack create -t heat-resources-stack.yaml <stack_name>
-     
-        +---------------------+--------------------------------------+                                                                                
-        | Field               | Value                                |                                                                                             
-        +---------------------+--------------------------------------+                                                         
-        | id                  | 9e90e65e-d2a8-428a-81ce-0d0223333273 |     
-        | stack_name          | heat-stack                           |        
-        | description         | Heat stack workshop                  |   
-        | creation_time       | 2021-11-26T10:12:35Z                 |    
-        | updated_time        | None                                 |
-        | stack_status        | CREATE_IN_PROGRESS                   |            
-        | stack_status_reason | Stack CREATE started                 |                                           
-        +---------------------+--------------------------------------+    
+This template will create the following and connect them up:
+  
+  * Instance
+  * router
+  * port 
+  * static ip 
+  * floating ip 
+  * volume 
+  * Instance 
+  
+**Create an Instance:**
 
-You will see that all your resources got created. You can verify cretead resources via commandline or via openstack horizon:
-         
-        openstack server list 
+Use the `OS::Nova::Server` resource to create a Compute instance. The `flavor` property is the only mandatory one, but you need to define a boot source using one of the `image` or `block_device_mapping` properties.
+You also need to define the networks property to indicate to which networks your instance must connect if multiple networks are available in your tenant.
 
-        +--------------------------------------+-------------+--------+--------------------------------------+------------------------------+-----------+
-        | ID                                   | Name        | Status | Networks                             | Image                        | Flavor    |
-        +--------------------------------------+-------------+--------+--------------------------------------+------------------------------+-----------+
-        | 0d2cc734-8de5-4f0d-b902-61c9cf5f4611 | heat_server | ACTIVE | heat_network=10.1.1.96, 185.22.97.37 | bionic-server-cloudimg-amd64 | m1.medium |
-        +--------------------------------------+-------------+--------+--------------------------------------+------------------------------+-----------+
-        
-        openstack network list
+**Connect an instance to a network:**
 
-        +--------------------------------------+--------------+--------------------------------------+
-        | ID                                   | Name         | Subnets                              |
-        +--------------------------------------+--------------+--------------------------------------+ 
-        | 30577cc5-2e52-4861-b52d-33dde4ac772e | heat_network | 0037fdd9-d617-420a-ae0d-3b83b3129f0a |  <---- heat-template created network
-        | 4acd59cc-7f03-4939-8dc4-841ec7528ca6 | public2      | c1a71a8b-ddcd-4345-ae80-a0bf75a9d5d0 |  <---- public network (floating ip pool)
-        +--------------------------------------+--------------+--------------------------------------+
+Use the networks property of an `OS::Nova::Server` resource to define which networks an instance should connect to. Define each network as a YAML map, containing one of the following keys:
 
-        openstack subnet list
-       +--------------------------------------+---------------------------------------------+--------------------------------------+----------------+
-       | ID                                   | Name                                        | Network                              | Subnet         |
-       +--------------------------------------+---------------------------------------------+--------------------------------------+----------------+
-       | 0037fdd9-d617-420a-ae0d-3b83b3129f0a | heat-stack-heat_network_subnet-e3vtk3lpuiat | 30577cc5-2e52-4861-b52d-33dde4ac772e | 10.1.1.0/24    |
-       +--------------------------------------+---------------------------------------------+--------------------------------------+----------------+
-        
-        openstack port list
-        
-       +--------------------------------------+------------------------------------------+-------------------+------------------------------------------+--------+
-       | ID                                   | Name                                     | MAC Address       | Fixed IP Addresses                       | Status |
-       +-------------------------------+------------------------------------------+-------------------+-------------------------------------------------+--------+
-       | ac90e42c-7548-4915-b33c-5b402b021576 | heat-stack-heat_server_port-o5rzphrabibu | fa:16:3e:7f:41:6f | ip_address='10.1.1.96',                  | ACTIVE |
-       |                                      |                                          |                   | subnet_id='0037fdd9-d617-420a-ae0d-      |        |
-       |                                      |                                          |                   | 3b83b3129f0a'                            |        |
-       +--------------------------------------+------------------------------------------+-------------------+------------------------------------------+--------+                                                                                                       
-       openstack router list
-        
-        +--------------------------------------+-------------+--------+-------+-------------+-------+----------------------------------+
-        | ID                                   | Name        | Status | State | Distributed | HA    | Project                          |
-        +--------------------------------------+-------------+--------+-------+-------------+-------+----------------------------------+
-        | a9d1d8bb-a11f-4224-bcb6-f86636c41cba | test        | ACTIVE | UP    | False       | False | 6b667b69cd544138838b795557a00c60 |
-        | e3d84406-754d-49d4-98ec-749241175288 | heat_router | ACTIVE | UP    | False       | False | 6b667b69cd544138838b795557a00c60 |
-        +--------------------------------------+-------------+--------+-------+-------------+-------+----------------------------------+
+**port:**
 
-        openstack volume list
-        
-        +--------------------------------------+-------------------------------------+-----------+------+--------------------------------------+
-        | ID                                   | Name                                | Status    | Size | Attached to                          |
-        +--------------------------------------+-------------------------------------+-----------+------+--------------------------------------+
-        | affb3369-c3ea-4f1f-bef5-96f932142d2c | heat-stack-heat_volume-q6itn5uugwtp | in-use    |   20 | Attached to heat_server on /dev/sdb  |
-        | cb7f8f2e-d5bd-42e4-bcb4-b62f63dcc8a6 | volume-stack-volume-01-26jz4xci46ia | available |   20 |                                      |
-        +--------------------------------------+-------------------------------------+-----------+------+--------------------------------------+
+The ID of an existing Networking port. You usually create this port in the same template using an `OS::Neutron::Port` resource. You will be able to associate a floating IP to this port, and the port to your Compute instance.
 
-In this way the resources gets created in openstack env using heat-stack.
+**network:**
+
+The name or ID of an existing network. You don’t need to create an `OS::Neutron::Port` resource if you use this property. But you will not be able to use neutron floating IP association for this instance because there will be no specified port for server.
+
+**Create and associate a floating IP to an instance:**
+
+You can use two sets of resources to create and associate floating IPs to instances.
+  **1. OS::Nova resources:**
+    Use the `OS::Nova::FloatingIP` resource to create a floating IP, and the `OS::Nova::FloatingIPAssociation` resource to associate the floating IP to an instance.
+  **2. OS::Neutron resources:**
+    Use the `OS::Neutron::FloatingIP` resource to create a floating IP, and the `OS::Neutron::FloatingIPAssociation` resource to associate the floating IP to a port
+    we have used this set to create floating ip and attached to instance in this workshop.
+
+**Enable remote access to an instance:**
+  The `key_name` attribute of the `OS::Nova::Server` resource defines the key pair to use to enable SSH remote access
+  We can also specify `key_name` as parameter same as in `heat-resources-stack.yaml` template or key can be created.
+
+**Create a network and a subnet:**
+  Use the `OS::Neutron::Net` resource to create a network, and the `OS::Neutron::Subnet` resource to provide a subnet for this network
+
+**Create and manage a router:** 
+  Use the `OS::Neutron::Router` resource to create a router. You can define its gateway with the `external_gateway_info` property
+  
+**Create a volume:**
+  Use the `OS::Cinder::Volume` resource to create a new Block Storage volume. Also we can create it as parameter and use it in resources.
+
+**Attach a volume to an instance:**
+  Use the OS::Cinder::VolumeAttachment resource to attach a volume to an instance.
+
+For more details about heat-template orchestration guide please check official documentation metioned above.
