@@ -57,7 +57,10 @@ export OS_INTERFACE=public
      * 'heat_volume_size' : specify the external volume size which needs to be attached to the server
      * 'heat_floating_ip_net' : specify valid floating ip network name
   3. source openrc file using command `source openrc`
-  4. Lets create single volume in openstack env by running `heat-volume-stack.yaml` file
+    
+### Task-1
+
+Lets create single volume in openstack env by running `heat-volume-stack.yaml` file
      `openstack stack create -t heat-volume-stack.yaml <stack_name>`
      ```
         +---------------------+--------------------------------------+
@@ -111,7 +114,10 @@ export OS_INTERFACE=public
         | cb7f8f2e-d5bd-42e4-bcb4-b62f63dcc8a6 | volume-stack-volume-01-26jz4xci46ia | available |   20 |             |
         +--------------------------------------+-------------------------------------+-----------+------+-------------+
      ```
-  5. Create server with resources such as network, volume, floating ip, ports etc.
+
+### Task-2
+
+Create server with resources such as network, volume, floating ip, ports etc.
      `openstack stack create -t heat-resources-stack.yaml <stack_name>`
      
      Similarly, as we created volume using heat template this script will create all the necessary resources along with server.
