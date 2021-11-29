@@ -58,7 +58,7 @@ export OS_INTERFACE=public
      * 'heat_floating_ip_net' : specify valid floating ip network name
   3. source openrc file using command `source openrc`
     
-### Task-1
+### Task-1 : Volume creation in openstack using heat-template
 
 Lets create single volume in openstack env by running `heat-volume-stack.yaml` file
     
@@ -88,7 +88,6 @@ This will create a single volume of 10Gb size as follows:
   
 To resize volume change the `default` size in heat-volume-stack.yaml file to required value:
 
-    
      parameters:
        heat_volume_size:
          type: number
@@ -115,12 +114,77 @@ Run `openstack stack update -t heat-volume-stack.yaml <stack-name>`
         | cb7f8f2e-d5bd-42e4-bcb4-b62f63dcc8a6 | volume-stack-volume-01-26jz4xci46ia | available |   20 |             |
         +--------------------------------------+-------------------------------------+-----------+------+-------------+
 
-### Task-2
+### Task-2 : Create full resources in openstack 
 
-Create server with resources such as network, volume, floating ip, ports etc.
-     
-   `openstack stack create -t heat-resources-stack.yaml <stack_name>`
-     
+Create server with resources such as network, volume, floating ip, ports etc. 
+       
 Similarly, as we created volume using heat template this script will create all the necessary resources along with server.
+
+        `openstack stack create -t heat-resources-stack.yaml <stack_name>`
      
-    
+        +---------------------+--------------------------------------+                                                                                
+        | Field               | Value                                |                                                                                             
+        +---------------------+--------------------------------------+                                                         
+        | id                  | 9e90e65e-d2a8-428a-81ce-0d0223333273 |     
+        | stack_name          | heat-stack                           |        
+        | description         | Heat stack workshop                  |   
+        | creation_time       | 2021-11-26T10:12:35Z                 |    
+        | updated_time        | None                                 |
+        | stack_status        | CREATE_IN_PROGRESS                   |            
+        | stack_status_reason | Stack CREATE started                 |                                           
+        +---------------------+--------------------------------------+    
+
+You will see that all your resources got created. You can verify cretead resources via commandline or via openstack horizon:
+         
+        openstack server list 
+
+        +--------------------------------------+-------------+--------+--------------------------------------+------------------------------+-----------+
+        | ID                                   | Name        | Status | Networks                             | Image                        | Flavor    |
+        +--------------------------------------+-------------+--------+--------------------------------------+------------------------------+-----------+
+        | 0d2cc734-8de5-4f0d-b902-61c9cf5f4611 | heat_server | ACTIVE | heat_network=10.1.1.96, 185.22.97.37 | bionic-server-cloudimg-amd64 | m1.medium |
+        +--------------------------------------+-------------+--------+--------------------------------------+------------------------------+-----------+
+        
+        openstack network list
+
+        +--------------------------------------+--------------+--------------------------------------+
+        | ID                                   | Name         | Subnets                              |
+        +--------------------------------------+--------------+--------------------------------------+ 
+        | 30577cc5-2e52-4861-b52d-33dde4ac772e | heat_network | 0037fdd9-d617-420a-ae0d-3b83b3129f0a |  <---- heat-template created network
+        | 4acd59cc-7f03-4939-8dc4-841ec7528ca6 | public2      | c1a71a8b-ddcd-4345-ae80-a0bf75a9d5d0 |  <---- public network (floating ip pool)
+        +--------------------------------------+--------------+--------------------------------------+
+
+        openstack subnet list
+       +--------------------------------------+---------------------------------------------+--------------------------------------+----------------+
+       | ID                                   | Name                                        | Network                              | Subnet         |
+       +--------------------------------------+---------------------------------------------+--------------------------------------+----------------+
+       | 0037fdd9-d617-420a-ae0d-3b83b3129f0a | heat-stack-heat_network_subnet-e3vtk3lpuiat | 30577cc5-2e52-4861-b52d-33dde4ac772e | 10.1.1.0/24    |
+       +--------------------------------------+---------------------------------------------+--------------------------------------+----------------+
+        
+        openstack port list
+        
+       +--------------------------------------+------------------------------------------+-------------------+------------------------------------------+--------+
+       | ID                                   | Name                                     | MAC Address       | Fixed IP Addresses                       | Status |
+       +-------------------------------+------------------------------------------+-------------------+-------------------------------------------------+--------+
+       | ac90e42c-7548-4915-b33c-5b402b021576 | heat-stack-heat_server_port-o5rzphrabibu | fa:16:3e:7f:41:6f | ip_address='10.1.1.96',                  | ACTIVE |
+       |                                      |                                          |                   | subnet_id='0037fdd9-d617-420a-ae0d-      |        |
+       |                                      |                                          |                   | 3b83b3129f0a'                            |        |
+       +--------------------------------------+------------------------------------------+-------------------+------------------------------------------+--------+                                                                                                       
+       openstack router list
+        
+        +--------------------------------------+-------------+--------+-------+-------------+-------+----------------------------------+
+        | ID                                   | Name        | Status | State | Distributed | HA    | Project                          |
+        +--------------------------------------+-------------+--------+-------+-------------+-------+----------------------------------+
+        | a9d1d8bb-a11f-4224-bcb6-f86636c41cba | test        | ACTIVE | UP    | False       | False | 6b667b69cd544138838b795557a00c60 |
+        | e3d84406-754d-49d4-98ec-749241175288 | heat_router | ACTIVE | UP    | False       | False | 6b667b69cd544138838b795557a00c60 |
+        +--------------------------------------+-------------+--------+-------+-------------+-------+----------------------------------+
+
+        openstack volume list
+        
+        +--------------------------------------+-------------------------------------+-----------+------+--------------------------------------+
+        | ID                                   | Name                                | Status    | Size | Attached to                          |
+        +--------------------------------------+-------------------------------------+-----------+------+--------------------------------------+
+        | affb3369-c3ea-4f1f-bef5-96f932142d2c | heat-stack-heat_volume-q6itn5uugwtp | in-use    |   20 | Attached to heat_server on /dev/sdb  |
+        | cb7f8f2e-d5bd-42e4-bcb4-b62f63dcc8a6 | volume-stack-volume-01-26jz4xci46ia | available |   20 |                                      |
+        +--------------------------------------+-------------------------------------+-----------+------+--------------------------------------+
+
+In this way the resources gets created in openstack env using heat-stack.
