@@ -51,7 +51,6 @@ resources:
   heat_network_subnet:
     type: OS::Neutron::Subnet
     properties:
-      key_name: { get_param: ssh_key }
       network: { get_resource: heat_network }
       cidr: "10.1.1.0/24"
       dns_nameservers: ["8.8.8.8"]
@@ -73,12 +72,20 @@ resources:
       network: { get_resource: heat_network }
       fixed_ips:
         - subnet_id: { get_resource: heat_network_subnet }
+  heat-cinder-image-volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: { get_param: heat_volume_size }
+      image: { get_param: image }
   heat_server:
     type: OS::Nova::Server
     properties:
       name: heat_server
       flavor: { get_param: flavor }
-      image: { get_param: image }
+      key_name: { get_param: ssh_key }
+      block_device_mapping: [{"volume_id": { get_resource: heat-cinder-image-volume },
+                              "delete_on_termination": false,
+                              "device_name": "vda"}]
       networks:
         - port: { get_resource: heat_server_port }
   heat_server_public_ip:
