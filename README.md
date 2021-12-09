@@ -128,6 +128,6 @@ You can use two sets of resources to create and associate floating IPs to instan
 
 ### Task-3 : Multiple resource creation using nested stack
 
-Nested stacks are a mechanism of using built-in stack definitions for specific resource types. Now lets say we need create multiple volumes and specifying them in one template line by line is really a pain and frustrating. Instead we can use 'OS::Heat::ResourceGroup` to scale up combination of resources. Lets say we would like to create 2 volumes for that refer `task-1` along with `nested-heat-stack.yaml` template. Here we have specified the `count` of volumes in properties which will create 2 volumes after execution of `nested-heat-stack-yaml` template.
+Nested stacks are a mechanism of using built-in stack definitions for specific resource types. Now lets say we need create multiple volumes and specifying them in one template line by line is really a pain and frustrating. Instead we can use `OS::Heat::ResourceGroup` to scale up combination of resources. Lets say we would like to create 2 volumes for that refer `task-1` along with `nested-heat-stack.yaml` template. Here we have specified the `count` of volumes in properties which will create 2 volumes after execution of `nested-heat-stack-yaml` template.
 
 For more details about heat-template orchestration guide please check official documentation metioned above.
