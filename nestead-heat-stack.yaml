@@ -1,0 +1,8 @@
+heat_template_version: 2016-10-14
+
+resources:
+  rg:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 2
+      resource_def: {type: heat-volume-stack.yaml}
