@@ -1,0 +1,16 @@
+heat_template_version: 2015-04-30
+
+parameters:
+  size:
+    type: number
+    default: 1
+  name:
+    type: string
+    default: "default"
+
+resources:
+  node_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: { get_param: size }
+      name: { get_param: name }

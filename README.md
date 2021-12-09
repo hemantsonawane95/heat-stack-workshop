@@ -126,8 +126,21 @@ You can use two sets of resources to create and associate floating IPs to instan
 **Attach a volume to an instance:**
   Use the `OS::Cinder::VolumeAttachment` resource to attach a volume to an instance.
 
-### Task-3 : Multiple resource creation using nested stack
+### Task-3 : Connect to the instance
 
-Nested stacks are a mechanism of using built-in stack definitions for specific resource types. Now lets say we need create multiple volumes and specifying them in one template line by line is really a pain and frustrating. Instead we can use `OS::Heat::ResourceGroup` to scale up combination of resources. Lets say we would like to create 2 volumes for that refer `task-1` along with `nested-heat-stack.yaml` template. Here we have specified the `count` of volumes in properties which will create 2 volumes after execution of `nested-heat-stack-yaml` template.
+  Modify the code written in the previous task so that you are able to connect inside the created server.
 
-For more details about heat-template orchestration guide please check official documentation metioned above.
+### Task-4 : Advanced Heat templates
+
+  In the previous examples, all the resources were declared. When writing complex templates you are encouraged to break up your template into separate smaller templates. These can then be brought together using template resources. This is a mechanism to define a resource using a template, thus composing one logical stack with multiple templates.
+
+  In the `advanced` folder of this repository, we prepared an example how to re-use the same piece of code to create multiple components. 
+    openstack stack create -t template/lab.yaml -e env/tcpisek.env <stack-name>
+
+  The goal of this task is to create a resource BasicServer and instanciate this resource several time.
+  The `BasicServer` resource is composent of the following parts:
+  - a volume created from an image given as a parameter
+  - a port created on a subnet given as a parameter
+  - a server booting from that volume
+  - ... and all the other resources which will allow you to connect to that server using ssh.
+

@@ -1,0 +1,24 @@
+heat_template_version: 2015-04-30
+
+parameters:
+  basic01_name:
+    type: string
+  basic01_size:
+    type: number
+  basic02_name:
+    type: string
+  basic02_size:
+    type: number
+
+resources:
+  basic01:
+    type: DevTest::Lab::BasicVolume
+    properties:
+      name: { get_param: basic01_name }
+      size: { get_param: basic01_size }
+
+  basic02:
+    type: DevTest::Lab::BasicVolume
+    properties:
+      name: { get_param: basic02_name }
+      size: { get_param: basic02_size }
